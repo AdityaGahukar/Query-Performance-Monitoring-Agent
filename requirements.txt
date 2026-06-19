@@ -1,0 +1,48 @@
+# =============================================================================
+# POV-4: Python Dependencies
+# =============================================================================
+# IMPORTANT: Requires Python 3.11, 3.12, or 3.13.
+# Python 3.14+ is NOT supported — pydantic-core 2.x depends on PyO3 0.22.x
+# which does not yet support Python 3.14.
+# Create the venv explicitly: python3.11 -m venv .venv
+# =============================================================================
+# Phase 1 installs only the foundation layer dependencies.
+# Future phases will append their own dependencies below the relevant section.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Phase 1: Foundation & Domain Layer
+# -----------------------------------------------------------------------------
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pydantic==2.10.3
+pydantic-settings==2.6.1
+
+# -----------------------------------------------------------------------------
+# Phase 1: Testing
+# -----------------------------------------------------------------------------
+pytest==8.3.4
+pytest-asyncio==0.24.0
+pytest-cov==6.0.0
+httpx==0.28.1           # Required by FastAPI TestClient
+
+# -----------------------------------------------------------------------------
+# Phase 2: Telemetry Collection (NOT YET ACTIVE)
+# -----------------------------------------------------------------------------
+# snowflake-connector-python==3.12.2
+
+# -----------------------------------------------------------------------------
+# Phase 5: RCA Agent (NOT YET ACTIVE)
+# -----------------------------------------------------------------------------
+# langchain==0.3.7
+# langchain-google-genai==2.0.4
+
+# -----------------------------------------------------------------------------
+# Phase 6: Orchestration (NOT YET ACTIVE)
+# -----------------------------------------------------------------------------
+# apscheduler==3.10.4
+
+# -----------------------------------------------------------------------------
+# Phase 7: Notifications (NOT YET ACTIVE)
+# -----------------------------------------------------------------------------
+# httpx is already listed above (used for both testing and outbound HTTP)
