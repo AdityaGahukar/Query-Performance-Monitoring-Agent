@@ -45,6 +45,8 @@ class SnowflakeSettings(BaseSettings):
         env_prefix="SNOWFLAKE_",
         populate_by_name=True,
         extra="ignore",
+        env_file=".env",
+        env_file_encoding="utf-8",
     )
 
 
@@ -59,6 +61,8 @@ class GeminiSettings(BaseSettings):
         env_prefix="GEMINI_",
         extra="ignore",
         protected_namespaces=("settings_",),  # suppress conflict warning for model_name field
+        env_file=".env",
+        env_file_encoding="utf-8",
     )
 
     api_key: str = Field(description="Google Gemini API key.")
@@ -87,7 +91,12 @@ class LoggingSettings(BaseSettings):
     POV-4 uses structured (JSON) logging for consistency across all modules.
     """
 
-    model_config = SettingsConfigDict(env_prefix="LOG_", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_prefix="LOG_", 
+        extra="ignore",
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
 
     level: str = Field(
         default="INFO",
@@ -125,7 +134,12 @@ class SchedulerSettings(BaseSettings):
     Reference: docs/collection-strategy.md §2
     """
 
-    model_config = SettingsConfigDict(env_prefix="SCHEDULER_", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_prefix="SCHEDULER_", 
+        extra="ignore",
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
 
     query_history_interval_minutes: int = Field(
         default=5,
@@ -162,7 +176,12 @@ class StorageSettings(BaseSettings):
     Reference: docs/implementation_roadmap.md Phase 4 (Architectural Decision).
     """
 
-    model_config = SettingsConfigDict(env_prefix="STORAGE_", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_prefix="STORAGE_", 
+        extra="ignore",
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
 
     findings_table: str = Field(
         default="POV4_PERFORMANCE_FINDINGS",
