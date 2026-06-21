@@ -26,14 +26,14 @@ This document evaluates available Snowflake telemetry sources for POV-4, classif
 8. **Data volume considerations**: Low to Medium.
 9. **Collection frequency considerations**: Medium (every 15-30 minutes).
 
-### 3. QUERY_PROFILE
-1. **Description**: Provides detailed, step-by-step execution plans for individual queries.
-2. **Key fields available**: `STEP_ID`, `OPERATOR_TYPE`, `EXECUTION_TIME_FRACTION`, `BYTES_WRITTEN`, `RECORDS_PRODUCED`.
+### 3. QUERY_PROFILE (via GET_QUERY_OPERATOR_STATS)
+1. **Description**: Provides tabular execution statistics for individual query operators (replaces `SYSTEM$GET_QUERY_PROFILE` which was inaccessible).
+2. **Key fields available**: `OPERATOR_ID`, `OPERATOR_TYPE`, `EXECUTION_TIME_FRACTION`, `BYTES_SPILLED_LOCAL`, `BYTES_SPILLED_REMOTE`.
 3. **Detection use cases**: Typically used after detection for deep inspection.
 4. **RCA use cases**: Identifying exactly which step caused a spill or took the most time.
-5. **Recommendation use cases**: Highly precise SQL rewrite recommendations.
-6. **Benefits**: Unmatched depth for RCA. Essential for the LLM Analysis Agent.
-7. **Limitations**: Very expensive to collect for all queries. Must be fetched on-demand.
+5. **Recommendation use cases**: Highly precise SQL rewrite recommendations based on failing nodes.
+6. **Benefits**: Provides execution metrics essential for the LLM Analysis Agent. Flattened tabular structure is easier to parse than a raw execution tree.
+7. **Limitations**: Very expensive to collect for all queries. Must be fetched on-demand. Lacks the visual tree layout of the web UI, requiring the LLM to reconstruct context from parent/child IDs if needed.
 8. **Data volume considerations**: Very high per query. 
 9. **Collection frequency considerations**: On-demand only (triggered by Issue Detection).
 

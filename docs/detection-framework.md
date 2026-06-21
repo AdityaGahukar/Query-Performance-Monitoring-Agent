@@ -31,7 +31,7 @@ Severity is computed deterministically per issue based on thresholds:
 ## 4. Confidence Score Generation Rules
 Confidence represents the structural validity and completeness of the finding, generated deterministically by the framework (not the LLM).
 - **Base Score**: Starts at `1.0`.
-- **Penalty (-0.2)**: If `QUERY_PROFILE` could not be retrieved (timeout/error).
+- **Penalty (-0.2)**: If `query_profile` (`GET_QUERY_OPERATOR_STATS`) could not be retrieved (timeout/error).
 - **Penalty (-0.1)**: If `QUERY_ATTRIBUTION_HISTORY` is lagging and unavailable.
 - **Penalty (-0.3)**: If the LLM `AnalysisResult` returned a fallback/default due to a parsing error or timeout.
 `confidence_reason` strictly lists the deductions applied (e.g., "0.8 - Query Profile unavailable").

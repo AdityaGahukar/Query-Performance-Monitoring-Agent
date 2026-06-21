@@ -6,27 +6,27 @@ This document maps specific performance and cost issues detected by POV-4 to the
 - **Detection Sources**: 
   - `QUERY_HISTORY` (Mandatory): `BYTES_SPILLED_TO_REMOTE_STORAGE` indicates the issue.
 - **RCA Sources**: 
-  - `QUERY_PROFILE` (Mandatory): Pinpoints the specific operator (e.g., massive Join or Sort) causing the spill.
+  - `query_profile` (via `GET_QUERY_OPERATOR_STATS`) (Mandatory): Pinpoints the specific operator (e.g., massive Join or Sort) causing the spill.
   - `WAREHOUSE_LOAD_HISTORY` (Enrichment): Shows if the warehouse was heavily loaded, reducing available memory per query.
 - **Recommendation Sources**: 
-  - `QUERY_PROFILE` (Mandatory): Provides structural SQL rewrite hints.
+  - `query_profile` (via `GET_QUERY_OPERATOR_STATS`) (Mandatory): Provides structural SQL rewrite hints.
   - `QUERY_ATTRIBUTION_HISTORY` (Enrichment): Calculates the financial cost of the spilling query to prioritize fixes.
 
 ## 2. LOCAL_SPILL
 - **Detection Sources**: 
   - `QUERY_HISTORY` (Mandatory): `BYTES_SPILLED_TO_LOCAL_STORAGE`.
 - **RCA Sources**: 
-  - `QUERY_PROFILE` (Mandatory): Identifies the spilling node.
+  - `query_profile` (via `GET_QUERY_OPERATOR_STATS`) (Mandatory): Identifies the spilling node.
 - **Recommendation Sources**: 
-  - `QUERY_PROFILE` (Mandatory): Suggests filtering earlier in the plan or clustering.
+  - `query_profile` (via `GET_QUERY_OPERATOR_STATS`) (Mandatory): Suggests filtering earlier in the plan or clustering.
 
 ## 3. LONG_RUNNING_QUERY
 - **Detection Sources**: 
   - `QUERY_HISTORY` (Mandatory): `EXECUTION_TIME` exceeds thresholds.
 - **RCA Sources**: 
-  - `QUERY_PROFILE` (Mandatory): Reveals time spent (e.g., scanning vs joining).
+  - `query_profile` (via `GET_QUERY_OPERATOR_STATS`) (Mandatory): Reveals time spent (e.g., scanning vs joining).
 - **Recommendation Sources**: 
-  - `QUERY_PROFILE` (Mandatory): Identifies missing filters or inefficient joins.
+  - `query_profile` (via `GET_QUERY_OPERATOR_STATS`) (Mandatory): Identifies missing filters or inefficient joins.
   - `QUERY_ATTRIBUTION_HISTORY` (Enrichment): Prioritizes the finding based on compute cost.
 
 ## 4. QUEUE_WAIT

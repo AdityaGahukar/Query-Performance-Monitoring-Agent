@@ -12,7 +12,7 @@ This document explicitly defines the core entities in the POV-4 domain model.
 - `query_id` (String)
 - `warehouse_name` (String)
 - `query_history` (JSON - execution statistics like spills, queues, and duration)
-- `query_profile` (JSON - execution plan tree, fetched on-demand)
+- `query_profile` (JSON - tabular operator stats via `GET_QUERY_OPERATOR_STATS`, fetched on-demand)
 - `warehouse_load` (JSON - system concurrency context during execution)
 - `metering_context` (JSON - account or warehouse credit consumption)
 - `query_attribution` (JSON - exact compute cost of the specific query)

@@ -21,7 +21,7 @@ To ensure Exactly-Once processing and prevent alert duplication:
 
 ## 4. Query Profile Retrieval Strategy
 Profiles are massive and cannot be synced universally.
-- **On-Demand Only**: `SYSTEM$GET_QUERY_PROFILE(query_id)` is invoked *only* if the Detection Engine flags a specific query with an issue.
+- **On-Demand Only**: `GET_QUERY_OPERATOR_STATS(query_id)` is invoked *only* if the Detection Engine flags a specific query with an issue.
 - **Pruning**: Only the heaviest operators (top N by `EXECUTION_TIME_FRACTION`) and failing nodes are extracted and injected into the LLM prompt to save token context limits.
 
 ## 5. Failure Recovery Strategy

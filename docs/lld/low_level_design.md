@@ -44,7 +44,7 @@ class TelemetrySnapshot(BaseModel):
     query_id: str
     warehouse_name: str
     query_history: Dict[str, Any]
-    query_profile: Optional[Dict[str, Any]]
+    query_profile: Optional[Dict[str, Any]]  # populated via GET_QUERY_OPERATOR_STATS
     warehouse_load: Dict[str, Any]
     metering_context: Dict[str, Any]
     query_attribution: Dict[str, Any]
