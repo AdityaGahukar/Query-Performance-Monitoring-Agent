@@ -62,7 +62,7 @@ Build the rule-based engine that mathematically evaluates telemetry against conf
 - `services/detector.py` with the Rule Registry.
 - Implementations for the core issues (e.g., `REMOTE_SPILL`, `COST_ANOMALY`).
 - Severity calculation logic.
-- Confidence score deduction logic.
+- Telemetry completeness / EvidenceQuality logic.
 
 **Dependencies:** 
 - Phase 1 (Domain Models).
@@ -71,7 +71,7 @@ Build the rule-based engine that mathematically evaluates telemetry against conf
 - Data-driven unit testing. Feed the engine mock `TelemetrySnapshot`s with values just below and just above thresholds to ensure boundary conditions are met.
 
 **Success Criteria:** 
-- The engine accurately flags an issue, assigns the correct severity, calculates the baseline confidence score, and returns a valid list of `DetectedIssue`s. 
+- The engine accurately flags an issue, assigns the correct severity, determines the EvidenceQuality, and returns a valid list of `DetectedIssue`s. 
 - The detection engine processes snapshots efficiently and deterministically.
 
 ---

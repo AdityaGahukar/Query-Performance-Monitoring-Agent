@@ -13,7 +13,7 @@ class IssueType(str, Enum):
     """
     Catalog of detectable performance issue types.
 
-    Values are defined in docs/detection-framework.md Section 1.
+    Values are defined in docs/detection/v1_detection_catalog.md.
     Each value maps to a deterministic detection rule in the Issue Detection Engine.
     """
 
@@ -23,26 +23,32 @@ class IssueType(str, Enum):
     LOCAL_SPILL = "LOCAL_SPILL"
     """Data written to local SSD during sort/join operations."""
 
+    POOR_PARTITION_PRUNING = "POOR_PARTITION_PRUNING"
+    """Excessive I/O scanning due to non-selective query predicates."""
+
+    EXPENSIVE_JOIN = "EXPENSIVE_JOIN"
+    """Join operator causing explosive multiplication of output rows."""
+
+    CARTESIAN_JOIN = "CARTESIAN_JOIN"
+    """Unintentional Cartesian product producing catastrophic row counts."""
+
     LONG_RUNNING_QUERY = "LONG_RUNNING_QUERY"
     """Query execution time significantly exceeding normal boundaries."""
 
-    QUEUE_WAIT = "QUEUE_WAIT"
-    """Query delayed due to warehouse overloading."""
-
-    WAREHOUSE_SATURATION = "WAREHOUSE_SATURATION"
-    """Cluster running at maximum concurrency."""
-
-    COST_ANOMALY = "COST_ANOMALY"
-    """Account or warehouse-level credit usage exceeds standard patterns."""
-
-    HIGH_CREDIT_CONSUMPTION = "HIGH_CREDIT_CONSUMPTION"
-    """Individual query compute cost is extremely high."""
+    QUEUE_OVERLOAD = "QUEUE_OVERLOAD"
+    """Query delayed in the overload queue due to warehouse capacity ceiling."""
 
     PROVISIONING_DELAY = "PROVISIONING_DELAY"
-    """Wait time due to warehouse startup or resume."""
+    """Wait time due to warehouse startup or resume provisioning."""
 
-    CONCURRENCY_BOTTLENECK = "CONCURRENCY_BOTTLENECK"
-    """Large number of queued queries despite cluster scaling limits."""
+    TRANSACTION_BLOCKED = "TRANSACTION_BLOCKED"
+    """DML statement blocked waiting for a lock held by another transaction."""
+
+    HIGH_NETWORK_SHUFFLE = "HIGH_NETWORK_SHUFFLE"
+    """Excessive inter-node data redistribution across multi-node warehouses."""
+
+    COST_ANOMALY = "COST_ANOMALY"
+    """Single query credit cost exceeds historical baseline plus stddev."""
 
 
 class IssueSeverity(str, Enum):
@@ -102,3 +108,12 @@ class AlertStatus(str, Enum):
 
     FAILED = "FAILED"
     """Delivery failed. Event is queued for retry via DLQ."""
+
+
+class EvidenceQuality(str, Enum):
+    """
+    Indicates the completeness of the telemetry collected.
+    """
+    COMPLETE = "COMPLETE"
+    PARTIAL = "PARTIAL"
+    LIMITED = "LIMITED"

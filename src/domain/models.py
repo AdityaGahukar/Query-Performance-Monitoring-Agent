@@ -18,10 +18,10 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
 
-from src.domain.enums import AlertDestination, AlertStatus, IssueSeverity, IssueType
+from src.domain.enums import AlertDestination, AlertStatus, IssueSeverity, IssueType, EvidenceQuality
 
 
 # ---------------------------------------------------------------------------
@@ -184,6 +184,32 @@ class Recommendation(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# ConfidenceScore
+# ---------------------------------------------------------------------------
+
+class ConfidenceScore(BaseModel):
+    """
+    LLM-generated confidence score for the analysis and recommendations.
+    """
+    score: float = Field(
+        description="Confidence score for this RCA and recommendation, range [0.0, 1.0].",
+        ge=0.0,
+        le=1.0,
+    )
+    reason: str = Field(
+        description="Human-readable explanation of why this confidence score was given.",
+        min_length=1,
+    )
+
+    @field_validator("score")
+    @classmethod
+    def validate_score(cls, v: float) -> float:
+        """Ensures confidence score is rounded to 2 decimal places."""
+        return round(v, 2)
+
+    model_config = {"frozen": True}
+
+# ---------------------------------------------------------------------------
 # AnalysisResult
 # ---------------------------------------------------------------------------
 
@@ -193,12 +219,6 @@ class AnalysisResult(BaseModel):
     The structured output from the single LLM Analysis Agent (Google Gemini).
 
     Produced by src/agents/analyzer.py via LangChain's PydanticOutputParser.
-    If the LLM fails or times out, the pipeline proceeds with analysis=None
-    on the PerformanceFinding and applies a confidence score penalty.
-
-    Note: confidence_score and confidence_reason are NOT part of AnalysisResult.
-    They live on PerformanceFinding because confidence is computed deterministically
-    by the framework, not by the LLM.
 
     Reference: docs/domain-model/domain_model.md §4
     Reference: docs/adr/0002-single-agent-architecture.md
@@ -222,6 +242,9 @@ class AnalysisResult(BaseModel):
             "model version, latency_ms, input_tokens, output_tokens."
         ),
     )
+    confidence: ConfidenceScore = Field(
+        description="Confidence scoring for the generated analysis.",
+    )
 
     model_config = {"frozen": True}
 
@@ -241,8 +264,6 @@ class PerformanceFinding(BaseModel):
         3. Dispatched as an AlertEvent payload to Teams, Email, and POV-3.
 
     Severity rule: overall_severity is the highest severity across all issues.
-    Confidence rule: starts at 1.0 and is penalised deterministically.
-        See docs/detection-framework.md §4 for penalty rules.
 
     Reference: docs/domain-model/domain_model.md §5
     Reference: docs/hld/high_level_design.md §3
@@ -269,22 +290,9 @@ class PerformanceFinding(BaseModel):
             "Computed deterministically by the Detection Engine."
         ),
     )
-    confidence_score: float = Field(
-        description=(
-            "Structural completeness score for this finding, range [0.0, 1.0]. "
-            "Starts at 1.0 and is reduced by deterministic penalties "
-            "(e.g. missing query profile, LLM fallback). "
-            "See docs/detection-framework.md §4."
-        ),
-        ge=0.0,
-        le=1.0,
-    )
-    confidence_reason: str = Field(
-        description=(
-            "Human-readable explanation of confidence score deductions applied, "
-            "e.g. '1.0 - 0.2 (query profile unavailable)'."
-        ),
-        min_length=1,
+    evidence_quality: EvidenceQuality = Field(
+        default=EvidenceQuality.COMPLETE,
+        description="Represents the completeness of the telemetry collected.",
     )
     issues: list[DetectedIssue] = Field(
         description="One or more performance issues detected in this finding.",
@@ -301,11 +309,6 @@ class PerformanceFinding(BaseModel):
         ),
     )
 
-    @field_validator("confidence_score")
-    @classmethod
-    def validate_confidence_score(cls, v: float) -> float:
-        """Ensures confidence score is rounded to 2 decimal places for consistency."""
-        return round(v, 2)
 
     @model_validator(mode="after")
     def validate_overall_severity(self) -> PerformanceFinding:

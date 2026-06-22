@@ -9,7 +9,7 @@
 1. **Snowflake API Rate Limiting**: Continually polling Snowflake for telemetry might hit API limits or consume unnecessary compute credits.
    - *Mitigation*: Use batch processing and stateful cursors (watermarks) to only fetch delta telemetry. Target `ACCOUNT_USAGE` where latency is acceptable to reduce warehouse costs.
 2. **LLM Hallucination on RCA**: The LLM might suggest irrelevant Snowflake features or hallucinate root causes.
-   - *Mitigation*: Provide strict system instructions, inject only highly relevant metric attributes (avoiding overwhelming raw logs), and require the LLM to output a `confidence_score` that downstream consumers can filter by.
+   - *Mitigation*: Provide strict system instructions, inject only highly relevant metric attributes (avoiding overwhelming raw logs), and require the LLM to output a `confidence` score within the `AnalysisResult` that downstream consumers can filter by.
 3. **Data Volume Overload (Alert Fatigue)**: A suddenly poorly written query in a loop could generate thousands of identical issues per minute.
    - *Mitigation*: Implement deduplication and rate-limiting at the aggregation layer before sending `AlertEvent`s. Group similar `PerformanceFinding`s by `query_id` hash or `warehouse`.
 

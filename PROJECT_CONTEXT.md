@@ -54,7 +54,7 @@ POV-4 is responsible for:
 2. Detecting performance issues.
 3. Performing root cause analysis.
 4. Generating optimization recommendations.
-5. Producing confidence-scored findings.
+5. Producing findings with LLM analysis and confidence scoring.
 6. Sending notifications.
 7. Forwarding findings to POV-3.
 
@@ -141,7 +141,7 @@ Every finding must include:
 - Supporting metrics
 - RCA summary
 - Recommendations
-- Confidence score
+- AI Analysis Confidence score (within AnalysisResult)
 
 The system should always explain why a recommendation was generated.
 
@@ -165,10 +165,9 @@ Historical findings will eventually support:
 
 POV-4 produces structured Performance Findings containing:
 - Detected issues
+- Evidence quality
 - Supporting metrics
-- RCA summaries
-- Recommendations
-- Confidence scores
+- RCA summaries, recommendations, and AI analysis confidence scores
 
 POV-3 consumes these findings to perform downstream optimization activities.
 
@@ -200,7 +199,8 @@ Example structure:
   "timestamp": "...",
   "query_id": "...",
   "warehouse": "...",
-  "severity": "...",
+  "overall_severity": "...",
+  "evidence_quality": "...",
   "issues": [
     {
       "type": "REMOTE_SPILL",
@@ -209,8 +209,9 @@ Example structure:
   ],
   "metrics": {},
   "analysis": {
-    "root_cause": "...",
+    "root_cause_summary": "...",
     "recommendations": [],
+    "llm_metadata": {},
     "confidence": {
       "score": 0.87,
       "reason": "..."

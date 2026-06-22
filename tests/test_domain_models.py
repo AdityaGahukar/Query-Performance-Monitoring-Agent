@@ -22,10 +22,11 @@ from uuid import UUID, uuid4
 import pytest
 from pydantic import ValidationError
 
-from src.domain.enums import AlertDestination, AlertStatus, IssueSeverity, IssueType
+from src.domain.enums import AlertDestination, AlertStatus, IssueSeverity, IssueType, EvidenceQuality
 from src.domain.models import (
     AlertEvent,
     AnalysisResult,
+    ConfidenceScore,
     DetectedIssue,
     PerformanceFinding,
     Recommendation,
@@ -40,11 +41,11 @@ from src.domain.models import (
 
 class TestIssueTypeEnum:
     def test_all_catalog_values_present(self):
-        """All 9 issue types from detection-framework.md §1 must be present."""
+        """All 11 issue types from v1_detection_catalog.md must be present."""
         expected = {
-            "REMOTE_SPILL", "LOCAL_SPILL", "LONG_RUNNING_QUERY", "QUEUE_WAIT",
-            "WAREHOUSE_SATURATION", "COST_ANOMALY", "HIGH_CREDIT_CONSUMPTION",
-            "PROVISIONING_DELAY", "CONCURRENCY_BOTTLENECK",
+            "REMOTE_SPILL", "LOCAL_SPILL", "POOR_PARTITION_PRUNING", "EXPENSIVE_JOIN",
+            "CARTESIAN_JOIN", "LONG_RUNNING_QUERY", "QUEUE_OVERLOAD", "PROVISIONING_DELAY",
+            "TRANSACTION_BLOCKED", "HIGH_NETWORK_SHUFFLE", "COST_ANOMALY"
         }
         actual = {member.value for member in IssueType}
         assert actual == expected
@@ -263,15 +264,14 @@ class TestAnalysisResult:
         with pytest.raises(ValidationError, match="recommendations"):
             AnalysisResult(**valid_analysis_result)
 
-    def test_confidence_score_not_on_analysis_result(self, valid_analysis_result):
+    def test_confidence_score_on_analysis_result(self, valid_analysis_result):
         """
-        Confidence score must NOT be on AnalysisResult.
-        It lives on PerformanceFinding (deterministic, not LLM-generated).
-        Reference: docs/domain-model/domain_model.md §4
+        Confidence score must be on AnalysisResult.
         """
         result = AnalysisResult(**valid_analysis_result)
-        assert not hasattr(result, "confidence_score")
-        assert not hasattr(result, "confidence_reason")
+        assert hasattr(result, "confidence")
+        assert result.confidence.score == 0.82
+        assert isinstance(result.confidence, ConfidenceScore)
 
     def test_llm_metadata_is_dict(self, valid_analysis_result):
         result = AnalysisResult(**valid_analysis_result)
@@ -282,6 +282,25 @@ class TestAnalysisResult:
         data = result.model_dump()
         restored = AnalysisResult(**data)
         assert restored.analysis_id == result.analysis_id
+
+
+# =============================================================================
+# ConfidenceScore tests
+# =============================================================================
+
+
+class TestConfidenceScore:
+    def test_confidence_score_rounded_to_2dp(self):
+        c = ConfidenceScore(score=0.79999, reason="test")
+        assert c.score == 0.80
+
+    def test_confidence_score_below_zero_raises(self):
+        with pytest.raises(ValidationError, match="score"):
+            ConfidenceScore(score=-0.1, reason="test")
+
+    def test_confidence_score_above_one_raises(self):
+        with pytest.raises(ValidationError, match="score"):
+            ConfidenceScore(score=1.01, reason="test")
 
 
 # =============================================================================
@@ -307,26 +326,11 @@ class TestPerformanceFinding:
         f2 = PerformanceFinding(**valid_performance_finding)
         assert f1.finding_id != f2.finding_id
 
-    def test_confidence_score_on_finding(self, valid_performance_finding):
-        """Confidence score must live on PerformanceFinding, not AnalysisResult."""
+    def test_evidence_quality_on_finding(self, valid_performance_finding):
+        """Evidence quality must live on PerformanceFinding."""
         finding = PerformanceFinding(**valid_performance_finding)
-        assert hasattr(finding, "confidence_score")
-        assert hasattr(finding, "confidence_reason")
-
-    def test_confidence_score_rounded_to_2dp(self, valid_performance_finding):
-        valid_performance_finding["confidence_score"] = 0.79999
-        finding = PerformanceFinding(**valid_performance_finding)
-        assert finding.confidence_score == 0.80
-
-    def test_confidence_score_below_zero_raises(self, valid_performance_finding):
-        valid_performance_finding["confidence_score"] = -0.1
-        with pytest.raises(ValidationError, match="confidence_score"):
-            PerformanceFinding(**valid_performance_finding)
-
-    def test_confidence_score_above_one_raises(self, valid_performance_finding):
-        valid_performance_finding["confidence_score"] = 1.01
-        with pytest.raises(ValidationError, match="confidence_score"):
-            PerformanceFinding(**valid_performance_finding)
+        assert hasattr(finding, "evidence_quality")
+        assert finding.evidence_quality == EvidenceQuality.COMPLETE
 
     def test_overall_severity_must_match_highest_issue(self, valid_performance_finding):
         """
@@ -359,7 +363,7 @@ class TestPerformanceFinding:
         parsed = json.loads(raw)
         assert "finding_id" in parsed
         assert parsed["overall_severity"] == "HIGH"
-        assert parsed["confidence_score"] == 0.8
+        assert parsed["evidence_quality"] == "COMPLETE"
 
     def test_frozen_immutability(self, valid_performance_finding):
         finding = PerformanceFinding(**valid_performance_finding)

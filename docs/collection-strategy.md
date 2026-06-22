@@ -26,7 +26,7 @@ Profiles are massive and cannot be synced universally.
 
 ## 5. Failure Recovery Strategy
 - **Snowflake API Unavailability**: Utilize an exponential backoff retry loop. The watermark ensures no telemetry is skipped once the connection restores.
-- **Missing Enrichment Data (Lag)**: If `QUERY_ATTRIBUTION_HISTORY` is delayed (due to Snowflake internal lag), the system will process the finding with `credits_attributed=null`, deduct points from the `confidence_score`, and proceed rather than halting the pipeline.
+- **Missing Enrichment Data (Lag)**: If `QUERY_ATTRIBUTION_HISTORY` is delayed (due to Snowflake internal lag), the system will process the finding with `credits_attributed=null`, set the finding's `evidence_quality` to `PARTIAL` (or `LIMITED`), and proceed rather than halting the pipeline.
 - **Dead-Letter Processing**: If a finding fails during aggregation or analysis, the raw `TelemetrySnapshot` is stored in a Dead Letter Queue (DLQ) for manual or automated replay.
 
 ## 6. Backfill Strategy

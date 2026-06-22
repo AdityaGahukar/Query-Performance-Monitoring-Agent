@@ -62,10 +62,16 @@ class Recommendation(BaseModel):
     description: str
     expected_impact: str
 
+class ConfidenceScore(BaseModel):
+    score: float
+    reason: str
+
 class AnalysisResult(BaseModel):
     analysis_id: UUID4
     root_cause_summary: str
     recommendations: List[Recommendation]
+    llm_metadata: Dict[str, Any]
+    confidence: ConfidenceScore
 
 class PerformanceFinding(BaseModel):
     finding_id: UUID4
@@ -73,8 +79,7 @@ class PerformanceFinding(BaseModel):
     query_id: str
     warehouse: str
     overall_severity: str
-    confidence_score: float
-    confidence_reason: str
+    evidence_quality: str
     issues: List[DetectedIssue]
     metrics: TelemetrySnapshot
     analysis: Optional[AnalysisResult]

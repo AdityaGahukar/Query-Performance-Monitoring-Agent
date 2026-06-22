@@ -51,7 +51,7 @@ How telemetry flows through the system to produce a `PerformanceFinding`:
 - **Inputs**: `TelemetrySnapshot`, List of `DetectedIssue`
 - **Outputs**: `AnalysisResult`
 - **Dependencies**: LangChain, Google Gemini API.
-- **Failure Handling**: If the LLM times out or fails structure parsing, system proceeds with a fallback `AnalysisResult` and applies a confidence penalty.
+- **Failure Handling**: If the LLM times out or fails structure parsing, system proceeds with a fallback `AnalysisResult` and sets a low/zero confidence score in it.
 
 ### 4.5 POV-3 Integration & Notification Layer
 - **Responsibilities**: Route alerts to Teams/Email, push findings to POV-3.

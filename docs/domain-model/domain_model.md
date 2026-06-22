@@ -44,6 +44,7 @@ This document explicitly defines the core entities in the POV-4 domain model.
 - `root_cause_summary` (String)
 - `recommendations` (List[Recommendation])
 - `llm_metadata` (JSON - latency, model version, token usage)
+- `confidence` (ConfidenceScore - score [0.0, 1.0] and reason explanation)
 **Usage**: Output of the Performance Analysis Agent.
 
 ### 5. PerformanceFinding
@@ -54,8 +55,7 @@ This document explicitly defines the core entities in the POV-4 domain model.
 - `query_id` (String)
 - `warehouse` (String)
 - `overall_severity` (Enum)
-- `confidence_score` (Float, 0.0 - 1.0)
-- `confidence_reason` (String)
+- `evidence_quality` (Enum: COMPLETE, PARTIAL, LIMITED)
 - `issues` (List[DetectedIssue])
 - `metrics` (TelemetrySnapshot)
 - `analysis` (AnalysisResult)

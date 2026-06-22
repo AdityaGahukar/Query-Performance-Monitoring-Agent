@@ -11,7 +11,7 @@ from uuid import uuid4
 
 import pytest
 
-from src.domain.enums import AlertDestination, AlertStatus, IssueSeverity, IssueType
+from src.domain.enums import AlertDestination, AlertStatus, IssueSeverity, IssueType, EvidenceQuality
 
 
 # ---------------------------------------------------------------------------
@@ -146,6 +146,10 @@ def valid_analysis_result(valid_recommendation) -> dict:
             "input_tokens": 412,
             "output_tokens": 187,
         },
+        "confidence": {
+            "score": 0.82,
+            "reason": "Operator statistics, query history, and warehouse telemetry consistently indicate memory pressure caused by a large join."
+        },
     }
 
 
@@ -167,9 +171,9 @@ def valid_performance_finding(
         "query_id": snapshot.query_id,
         "warehouse": snapshot.warehouse_name,
         "overall_severity": IssueSeverity.HIGH,
-        "confidence_score": 0.8,
-        "confidence_reason": "1.0 - 0.2 (query profile unavailable)",
+        "evidence_quality": EvidenceQuality.COMPLETE,
         "issues": [issue],
         "metrics": snapshot,
         "analysis": analysis,
     }
+
