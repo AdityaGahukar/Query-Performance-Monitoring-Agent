@@ -6,6 +6,22 @@ These fixtures are the canonical test data for Phase 1 and will be
 extended (not replaced) in future phases.
 """
 
+import os
+if not os.environ.get("RUN_SNOWFLAKE_INTEGRATION_TESTS"):
+    os.environ["POV4_TESTING"] = "true"
+    # Provide default mock values for FastAPI app instantiation at import time during unit tests
+    os.environ.setdefault("SNOWFLAKE_ACCOUNT", "test.us-east-1")
+    os.environ.setdefault("SNOWFLAKE_USER", "test_user")
+    os.environ.setdefault("SNOWFLAKE_PASSWORD", "test_pass")
+    os.environ.setdefault("SNOWFLAKE_WAREHOUSE", "TEST_WH")
+    os.environ.setdefault("SNOWFLAKE_DATABASE", "TEST_DB")
+    os.environ.setdefault("SNOWFLAKE_SCHEMA", "TEST_SCHEMA")
+    os.environ.setdefault("SNOWFLAKE_ROLE", "TEST_ROLE")
+    os.environ.setdefault("GEMINI_API_KEY", "test_gemini_key")
+    os.environ.setdefault("LOG_FORMAT", "text")
+
+
+
 from datetime import datetime, timezone
 from uuid import uuid4
 

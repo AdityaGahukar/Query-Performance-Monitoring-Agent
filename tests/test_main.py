@@ -17,18 +17,6 @@ import os
 import pytest
 from fastapi.testclient import TestClient
 
-# Provide minimal required env vars before importing the app,
-# since Settings are instantiated at module load via create_app().
-os.environ.setdefault("SNOWFLAKE_ACCOUNT", "test.us-east-1")
-os.environ.setdefault("SNOWFLAKE_USER", "test_user")
-os.environ.setdefault("SNOWFLAKE_PASSWORD", "test_pass")
-os.environ.setdefault("SNOWFLAKE_WAREHOUSE", "TEST_WH")
-os.environ.setdefault("SNOWFLAKE_DATABASE", "TEST_DB")
-os.environ.setdefault("SNOWFLAKE_SCHEMA", "TEST_SCHEMA")
-os.environ.setdefault("SNOWFLAKE_ROLE", "TEST_ROLE")
-os.environ.setdefault("GEMINI_API_KEY", "test_gemini_key")
-os.environ.setdefault("LOG_FORMAT", "text")  # text is cleaner in test output
-
 
 from src.app.main import app  # noqa: E402 — must come after env setup
 from src.core.logging import _JsonFormatter, _TextFormatter, configure_logging, get_logger  # noqa: E402

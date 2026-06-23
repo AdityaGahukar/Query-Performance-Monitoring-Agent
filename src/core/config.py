@@ -11,8 +11,12 @@ Reference: docs/architecture/project_structure.md (core/config.py)
 Reference: PROJECT_CONTEXT.md (Technology Stack)
 """
 
+import os
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Determine if running under unit tests to avoid reading dirty local .env file.
+_env_file = None if os.getenv("POV4_TESTING") == "true" else ".env"
 
 
 # ---------------------------------------------------------------------------
@@ -45,7 +49,7 @@ class SnowflakeSettings(BaseSettings):
         env_prefix="SNOWFLAKE_",
         populate_by_name=True,
         extra="ignore",
-        env_file=".env",
+        env_file=_env_file,
         env_file_encoding="utf-8",
     )
 
@@ -61,7 +65,7 @@ class GeminiSettings(BaseSettings):
         env_prefix="GEMINI_",
         extra="ignore",
         protected_namespaces=("settings_",),  # suppress conflict warning for model_name field
-        env_file=".env",
+        env_file=_env_file,
         env_file_encoding="utf-8",
     )
 
@@ -94,7 +98,7 @@ class LoggingSettings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="LOG_", 
         extra="ignore",
-        env_file=".env",
+        env_file=_env_file,
         env_file_encoding="utf-8",
     )
 
@@ -137,7 +141,7 @@ class SchedulerSettings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="SCHEDULER_", 
         extra="ignore",
-        env_file=".env",
+        env_file=_env_file,
         env_file_encoding="utf-8",
     )
 
@@ -179,7 +183,7 @@ class StorageSettings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="STORAGE_", 
         extra="ignore",
-        env_file=".env",
+        env_file=_env_file,
         env_file_encoding="utf-8",
     )
 
@@ -211,7 +215,7 @@ class Settings(BaseSettings):
     """
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=_env_file,
         env_file_encoding="utf-8",
         extra="ignore",
     )

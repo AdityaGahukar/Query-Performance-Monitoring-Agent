@@ -36,7 +36,7 @@ class SnowflakeClient:
             account=self.settings.account,
             warehouse=self.settings.warehouse,
             database=self.settings.database,
-            schema=self.settings.schema,
+            schema=self.settings.schema_name,
             role=self.settings.role,
         )
 
