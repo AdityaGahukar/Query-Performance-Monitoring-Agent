@@ -103,7 +103,7 @@ class TelemetryCollector:
                 query_id=qid,
                 warehouse_name=wh,
                 query_history=q,
-                query_profile=None,  # Intentionally omitted (Lazy fetch only)
+                operator_stats=None,  # Intentionally omitted (Lazy fetch only)
                 warehouse_load=q_load,
                 metering_context=q_metering,
                 query_attribution=q_attr,

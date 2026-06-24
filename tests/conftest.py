@@ -113,7 +113,7 @@ def valid_telemetry_snapshot(
         "query_id": "01b3c4d5-0000-0001-0000-000200000001",
         "warehouse_name": "ANALYTICS_WH",
         "query_history": valid_query_history,
-        "query_profile": None,  # Not fetched yet — on-demand only
+        "operator_stats": None,  # Not fetched yet — on-demand only
         "warehouse_load": valid_warehouse_load,
         "metering_context": valid_metering_context,
         "query_attribution": valid_query_attribution,

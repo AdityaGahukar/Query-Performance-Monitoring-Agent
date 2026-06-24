@@ -101,14 +101,14 @@ class TestTelemetrySnapshot:
         s2 = TelemetrySnapshot(**valid_telemetry_snapshot)
         assert s1.snapshot_id != s2.snapshot_id
 
-    def test_query_profile_defaults_to_none(self, valid_telemetry_snapshot):
+    def test_operator_stats_defaults_to_none(self, valid_telemetry_snapshot):
         snap = TelemetrySnapshot(**valid_telemetry_snapshot)
-        assert snap.query_profile is None
+        assert snap.operator_stats is None
 
-    def test_query_profile_accepted_when_provided(self, valid_telemetry_snapshot):
-        valid_telemetry_snapshot["query_profile"] = {"steps": [{"operator": "TableScan"}]}
+    def test_operator_stats_accepted_when_provided(self, valid_telemetry_snapshot):
+        valid_telemetry_snapshot["operator_stats"] = {"steps": [{"operator": "TableScan"}]}
         snap = TelemetrySnapshot(**valid_telemetry_snapshot)
-        assert snap.query_profile is not None
+        assert snap.operator_stats is not None
 
     def test_empty_query_id_raises(self, valid_telemetry_snapshot):
         valid_telemetry_snapshot["query_id"] = ""

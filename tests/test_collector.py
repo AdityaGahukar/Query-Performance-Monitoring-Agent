@@ -81,4 +81,4 @@ def test_collect_snapshots_alignment(mock_client, mock_wm):
         assert snap.warehouse_load.get("AVG_RUNNING") == 5
         assert snap.metering_context.get("CREDITS_USED_COMPUTE") == 2.5
         assert snap.query_attribution.get("CREDITS_ATTRIBUTED_COMPUTE") == 0.5
-        assert snap.query_profile is None  # Ensures lazy fetch constraint
+        assert snap.operator_stats is None  # Ensures lazy fetch constraint

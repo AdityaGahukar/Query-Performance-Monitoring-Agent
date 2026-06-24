@@ -35,7 +35,7 @@ class TelemetrySnapshot(BaseModel):
 
     Constructed by the Data Collection Layer from five V1 telemetry sources:
         - QUERY_HISTORY        -> query_history
-        - QUERY_PROFILE        -> query_profile  (optional, fetched on-demand)
+        - GET_QUERY_OPERATOR_STATS -> operator_stats  (optional, fetched on-demand)
         - WAREHOUSE_LOAD_HISTORY -> warehouse_load
         - METERING_HISTORY     -> metering_context
         - QUERY_ATTRIBUTION_HISTORY -> query_attribution
@@ -65,12 +65,12 @@ class TelemetrySnapshot(BaseModel):
             "execution duration, partition scan ratios, etc."
         ),
     )
-    query_profile: dict[str, Any] | None = Field(
+    operator_stats: list[dict[str, Any]] | dict[str, Any] | None = Field(
         default=None,
         description=(
-            "Execution plan tree from QUERY_PROFILE. "
+            "Tabular operator statistics from GET_QUERY_OPERATOR_STATS. "
             "Fetched on-demand only for queries flagged by the Detection Engine. "
-            "Null when the profile was not retrieved or retrieval failed."
+            "Null when statistics were not retrieved or retrieval failed."
         ),
     )
     warehouse_load: dict[str, Any] = Field(

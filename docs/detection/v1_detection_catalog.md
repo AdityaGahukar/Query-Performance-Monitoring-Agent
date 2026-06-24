@@ -12,7 +12,7 @@
 Rather than repeating criteria per detection, the system assigns an `EvidenceQuality` level to `PerformanceFinding` based on the status of required fields:
 * **`COMPLETE`**: All required fields (Primary and Secondary) are present and non-null.
 * **`PARTIAL`**: All Primary fields are present, but one or more Secondary/Enrichment fields are null (detection still fires).
-* **`LIMITED`**: Primary telemetry fields are present, but crucial diagnostic stats (e.g. failure to retrieve `query_profile` via `GET_QUERY_OPERATOR_STATS`) are unavailable.
+* **`LIMITED`**: Primary telemetry fields are present, but crucial diagnostic stats (e.g. failure to retrieve `operator_stats` via `GET_QUERY_OPERATOR_STATS`) are unavailable.
 
 *Note: Telemetry completeness does not gate or suppress deterministic detection rules.*
 

@@ -26,7 +26,7 @@ This document evaluates available Snowflake telemetry sources for POV-4, classif
 8. **Data volume considerations**: Low to Medium.
 9. **Collection frequency considerations**: Medium (every 15-30 minutes).
 
-### 3. QUERY_PROFILE (via GET_QUERY_OPERATOR_STATS)
+### 3. GET_QUERY_OPERATOR_STATS (Operator Stats)
 1. **Description**: Provides tabular execution statistics for individual query operators (replaces `SYSTEM$GET_QUERY_PROFILE` which was inaccessible).
 2. **Key fields available**: `OPERATOR_ID`, `OPERATOR_TYPE`, `EXECUTION_TIME_FRACTION`, `BYTES_SPILLED_LOCAL`, `BYTES_SPILLED_REMOTE`.
 3. **Detection use cases**: Typically used after detection for deep inspection.
@@ -138,7 +138,7 @@ This document evaluates available Snowflake telemetry sources for POV-4, classif
 | Telemetry Source | Detection Value | RCA Value | Recommendation Value | Priority | Justification |
 |------------------|----------------|-----------|----------------------|----------|---------------|
 | **`QUERY_HISTORY`** | Very High | High | Medium | **V1** | Primary source for individual query bottlenecks. |
-| **`QUERY_PROFILE`** | Low | Very High | Very High | **V1** | Deep execution plans essential for LLM RCA and rewrites. |
+| **`GET_QUERY_OPERATOR_STATS`** | Low | Very High | Very High | **V1** | Tabular operator statistics essential for LLM RCA and rewrites. |
 | **`WAREHOUSE_LOAD_HISTORY`** | High | High | Medium | **V1** | Crucial for system-wide queuing and concurrency bottlenecks. |
 | **`METERING_HISTORY`** | High | Medium | Low | **V1** | Needed to address the core business problem of cost overruns. |
 | **`QUERY_ATTRIBUTION_HISTORY`** | Medium | Medium | Very High | **V1** | Enables high-ROI prioritization of optimization findings. |
@@ -156,7 +156,7 @@ This document evaluates available Snowflake telemetry sources for POV-4, classif
 ### Must Have (V1 - Core Performance & FinOps Engine)
 - **`QUERY_HISTORY`**: The fundamental source for query bottlenecks.
 - **`WAREHOUSE_LOAD_HISTORY`**: Provides systemic concurrency context.
-- **`QUERY_PROFILE`**: The deepest RCA source for the LLM.
+- **`GET_QUERY_OPERATOR_STATS`**: The deepest RCA source for the LLM.
 - **`METERING_HISTORY`**: Fulfills the core business requirement to detect cost overruns.
 - **`QUERY_ATTRIBUTION_HISTORY`**: Identifies which problematic queries are the most expensive and ensures POV-4 outputs findings prioritized by optimization ROI.
 
@@ -166,7 +166,7 @@ This document evaluates available Snowflake telemetry sources for POV-4, classif
 - **`RESOURCE_MONITORS`**: Provides context on credit limits, budget breaches, and system throttling.
 
 ### Future Phase (V2+ - Storage & Holistic Observability)
-- **`TABLE_STORAGE_METRICS`**: Pushed to V2 since V1 RCA can leverage `QUERY_HISTORY` and `QUERY_PROFILE` for initial query tuning without requiring deep storage telemetry.
+- **`TABLE_STORAGE_METRICS`**: Pushed to V2 since V1 RCA can leverage `QUERY_HISTORY` and `GET_QUERY_OPERATOR_STATS` for initial query tuning without requiring deep storage telemetry.
 - **`TASK_HISTORY`**, **`ACCESS_HISTORY`**, **`DATABASE_STORAGE_USAGE_HISTORY`**: Deferred as they focus on pipelines, lifecycle management, and storage rather than immediate compute performance.
 
 ### V1 Strategy Rationale

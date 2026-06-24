@@ -32,8 +32,8 @@ Severity is computed deterministically per issue based on thresholds:
 
 ## 4. Telemetry Evidence Quality Assessment
 To represent telemetry completeness, the system assigns an `EvidenceQuality` level to the `PerformanceFinding`:
-- **COMPLETE**: All telemetry sources, including lazy-loaded query profiles, are successfully retrieved and present.
-- **PARTIAL**: Basic execution statistics are present, but non-blocking enrichment data (e.g., lag in `QUERY_ATTRIBUTION_HISTORY` or failure to fetch `query_profile`) is missing.
+- **COMPLETE**: All telemetry sources, including lazy-loaded query operator stats, are successfully retrieved and present.
+- **PARTIAL**: Basic execution statistics are present, but non-blocking enrichment data (e.g., lag in `QUERY_ATTRIBUTION_HISTORY` or failure to fetch `operator_stats`) is missing.
 - **LIMITED**: Significant telemetry is missing, indicating a sparse snapshot (e.g., only QUERY_HISTORY was successfully loaded).
 
 ## 5. Issue-to-Telemetry Mapping

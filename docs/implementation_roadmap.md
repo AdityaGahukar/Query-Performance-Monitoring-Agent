@@ -35,10 +35,10 @@ Implement the Snowflake integration capable of querying the V1 telemetry sources
 - `services/collector.py` using `snowflake-connector-python`.
 - Watermark tracking logic.
 - Dedicated functions for `QUERY_HISTORY`, `WAREHOUSE_LOAD_HISTORY`, `METERING_HISTORY`, and `QUERY_ATTRIBUTION_HISTORY`.
-- Lazy, on-demand `query_profile` fetcher (using `GET_QUERY_OPERATOR_STATS`).
+- Lazy, on-demand `operator_stats` fetcher (using `GET_QUERY_OPERATOR_STATS`).
 
 **Architectural Constraint:**
-- `query_profile` retrieval must be **lazy and on-demand**. Never fetch profiles for all queries. Only fetch profiles for candidate queries explicitly identified by the Detection Engine.
+- `operator_stats` retrieval must be **lazy and on-demand**. Never fetch profiles for all queries. Only fetch profiles for candidate queries explicitly identified by the Detection Engine.
 
 **Dependencies:** 
 - Phase 1 (Domain Models).
@@ -121,7 +121,7 @@ Integrate LangChain and Google Gemini to synthesize detected issues into Root Ca
 
 **Test Strategy:** 
 - **Unit Tests:** Mock the LLM HTTP response to test the Pydantic Output Parser's resilience to malformed JSON.
-- **E2E Tests:** Execute real API calls against Gemini using historically captured `query_profile` JSON strings.
+- **E2E Tests:** Execute real API calls against Gemini using historically captured `operator_stats` JSON strings.
 
 **Success Criteria:** 
 - The LLM consistently processes a `TelemetrySnapshot` + `DetectedIssue`s and returns a valid `AnalysisResult` containing root causes and recommendations.

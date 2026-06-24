@@ -26,7 +26,7 @@ How telemetry flows through the system to produce a `PerformanceFinding`:
 ## 4. Components & Responsibilities
 
 ### 4.1 Data Collection Layer
-- **Responsibilities**: Interface with Snowflake. Execute queries against account usage views. Lazy fetch `query_profile` (via `GET_QUERY_OPERATOR_STATS`) only when needed.
+- **Responsibilities**: Interface with Snowflake. Execute queries against account usage views. Lazy fetch `operator_stats` (via `GET_QUERY_OPERATOR_STATS`) only when needed.
 - **Inputs**: Polling triggers, configuration (Snowflake credentials).
 - **Outputs**: `TelemetrySnapshot`
 - **Dependencies**: Snowflake Python Connector.
