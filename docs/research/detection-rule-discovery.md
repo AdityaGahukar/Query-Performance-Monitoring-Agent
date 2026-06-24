@@ -124,7 +124,7 @@ This document outlines the theoretical foundation and required attributes for ev
 
 ## 11. HIGH_NETWORK_SHUFFLE
 1. **Business impact**: Slow execution due to excessive data movement between worker nodes.
-2. **Detection evidence**: High network traffic in execution profile.
+2. **Detection evidence**: High network traffic in execution operator stats.
 3. **Required telemetry sources**: `GET_QUERY_OPERATOR_STATS`.
 4. **Required operator statistics fields**: `NETWORK_BYTES` or similar.
 5. **Candidate formulas**: `NETWORK_BYTES > threshold`.

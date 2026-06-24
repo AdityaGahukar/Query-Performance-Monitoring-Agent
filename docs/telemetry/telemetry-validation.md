@@ -150,7 +150,7 @@ SELECT * FROM TABLE(GET_QUERY_OPERATOR_STATS('<query_id>'));
 - **Remote Spill detection:**
   - Look for `BYTES_SPILLED_REMOTE` inside execution nodes like `Aggregate` or `Join`. It pinpoints exactly *which* step in the query plan ran out of memory.
 - **Queue Wait analysis:**
-  - *Not useful here.* The profile only covers execution time. Queue wait times happen *before* execution starts and must be diagnosed using `QUERY_HISTORY`.
+  - *Not useful here.* The operator stats only cover execution time. Queue wait times happen *before* execution starts and must be diagnosed using `QUERY_HISTORY`.
 - **Join analysis:**
   - Inspect `JOIN_TYPE` (e.g., INNER, LEFT OUTER).
   - Look for explosive `RECORDS_PRODUCED` compared to `RECORDS_SCANNED`.
@@ -165,7 +165,7 @@ SELECT * FROM TABLE(GET_QUERY_OPERATOR_STATS('<query_id>'));
 **Usefulness:**
 - **Detection**: Low. (Too expensive and slow to use for broad detection).
 - **RCA**: Critical. This provides the execution tree required for the LLM to understand exactly why a query failed or spilled.
-- **Recommendations**: Critical. The LLM needs the profile to recommend specific SQL rewrites (e.g., "Push down the filter before step 3 to reduce the dataset size entering the join").
+- **Recommendations**: Critical. The LLM needs the operator stats to recommend specific SQL rewrites (e.g., "Push down the filter before step 3 to reduce the dataset size entering the join").
 
 ---
 

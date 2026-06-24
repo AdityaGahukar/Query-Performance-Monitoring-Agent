@@ -19,8 +19,8 @@ To ensure Exactly-Once processing and prevent alert duplication:
 - **Query Filter**: Each polling cycle appends `WHERE END_TIME > $watermark` and `END_TIME <= $current_cycle_end`.
 - **Update**: The watermark is advanced and committed only after the telemetry batch is successfully persisted.
 
-## 4. Query Profile Retrieval Strategy
-Profiles are massive and cannot be synced universally.
+## 4. Operator Stats Retrieval Strategy
+Operator stats are massive and cannot be synced universally.
 - **On-Demand Only**: `GET_QUERY_OPERATOR_STATS(query_id)` is invoked *only* if the Detection Engine flags a specific query with an issue.
 - **Pruning**: Only the heaviest operators (top N by `EXECUTION_TIME_FRACTION`) and failing nodes are extracted and injected into the LLM prompt to save token context limits.
 

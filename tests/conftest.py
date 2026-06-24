@@ -139,9 +139,12 @@ def valid_detected_issue(valid_telemetry_snapshot) -> dict:
 def valid_recommendation() -> dict:
     """Valid Recommendation constructor kwargs."""
     return {
-        "recommendation_type": "REWRITE_SQL",
+        "recommendation_type": "QUERY",
         "description": "Reduce the result set size before the JOIN by pushing filters earlier.",
         "expected_impact": "Estimated 60-80% reduction in remote spill volume.",
+        "priority": "HIGH",
+        "rationale": "Pushing down filters reduces the row count entering the aggregate and join operators, avoiding memory thrashing.",
+        "evidence": "Operator 3 (HashJoin) spilled 2GB to remote storage and accounted for 85% of execution time.",
     }
 
 

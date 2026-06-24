@@ -27,7 +27,7 @@ This document evaluates available Snowflake telemetry sources for POV-4, classif
 9. **Collection frequency considerations**: Medium (every 15-30 minutes).
 
 ### 3. GET_QUERY_OPERATOR_STATS (Operator Stats)
-1. **Description**: Provides tabular execution statistics for individual query operators (replaces `SYSTEM$GET_QUERY_PROFILE` which was inaccessible).
+1. **Description**: Provides tabular execution statistics for individual query operators via GET_QUERY_OPERATOR_STATS.
 2. **Key fields available**: `OPERATOR_ID`, `OPERATOR_TYPE`, `EXECUTION_TIME_FRACTION`, `BYTES_SPILLED_LOCAL`, `BYTES_SPILLED_REMOTE`.
 3. **Detection use cases**: Typically used after detection for deep inspection.
 4. **RCA use cases**: Identifying exactly which step caused a spill or took the most time.

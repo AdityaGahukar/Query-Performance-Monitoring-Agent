@@ -27,7 +27,7 @@ Below are the live queries executed and the corresponding issues caught and pers
 1. **Cartesian Join (`CARTESIAN_JOIN`)**:
    - *Breach details*: `CartesianJoin detected with rows > 1M (actual: 9,765,625)`
    - *Severity*: **`CRITICAL`**
-   - *Logic*: Caught by checking `ROWS_PRODUCED > 1,000,000` combined with real-time profile operator stats matching `CARTESIANJOIN`/`CROSS JOIN` nodes.
+   - *Logic*: Caught by checking `ROWS_PRODUCED > 1,000,000` combined with real-time operator stats matching `CARTESIANJOIN`/`CROSS JOIN` nodes.
 
 2. **Poor Partition Pruning (`POOR_PARTITION_PRUNING`)**:
    - *Breach details*: `pruning_ratio > 0.5 (ratio: 0.75, total: 2000)`

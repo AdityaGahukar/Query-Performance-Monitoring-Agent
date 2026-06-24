@@ -12,7 +12,7 @@ Confidence scoring belongs where uncertainty and probabilistic estimation exist,
 1. **Remove Detection Confidence**: We have completely removed confidence scoring (`confidence_score`, `confidence_reason`, and confidence deduction rules) from the deterministic Detection Layer and the core `PerformanceFinding` model.
 2. **Introduce Evidence Quality**: To track telemetry completeness without treating it as confidence, we introduced `EvidenceQuality` on the `PerformanceFinding` model. It takes three values:
    - `COMPLETE`: All telemetry sources are present.
-   - `PARTIAL`: Core statistics are present, but auxiliary data (e.g., lag in attribution history or profile retrieval failure) is missing.
+   - `PARTIAL`: Core statistics are present, but auxiliary data (e.g., lag in attribution history or operator stats retrieval failure) is missing.
    - `LIMITED`: Significant telemetry is missing, indicating a sparse snapshot.
 3. **Restrict Confidence to LLM Analysis**: Confidence scoring resides exclusively inside the `AnalysisResult` model as `confidence` (a `ConfidenceScore` entity with `score` and `reason`). This represents the AI agent's uncertainty in its generated RCA narrative and recommendations.
 

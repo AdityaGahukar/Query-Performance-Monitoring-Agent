@@ -203,7 +203,10 @@ class TestRecommendation:
     def test_valid_construction(self, valid_recommendation):
         rec = Recommendation(**valid_recommendation)
         assert isinstance(rec.recommendation_id, UUID)
-        assert rec.recommendation_type == "REWRITE_SQL"
+        assert rec.recommendation_type == "QUERY"
+        assert rec.priority == "HIGH"
+        assert rec.rationale == "Pushing down filters reduces the row count entering the aggregate and join operators, avoiding memory thrashing."
+        assert rec.evidence == "Operator 3 (HashJoin) spilled 2GB to remote storage and accounted for 85% of execution time."
 
     def test_recommendation_id_auto_generated(self, valid_recommendation):
         r1 = Recommendation(**valid_recommendation)
@@ -223,6 +226,21 @@ class TestRecommendation:
     def test_empty_expected_impact_raises(self, valid_recommendation):
         valid_recommendation["expected_impact"] = ""
         with pytest.raises(ValidationError, match="expected_impact"):
+            Recommendation(**valid_recommendation)
+
+    def test_empty_priority_raises(self, valid_recommendation):
+        valid_recommendation["priority"] = ""
+        with pytest.raises(ValidationError, match="priority"):
+            Recommendation(**valid_recommendation)
+
+    def test_empty_rationale_raises(self, valid_recommendation):
+        valid_recommendation["rationale"] = ""
+        with pytest.raises(ValidationError, match="rationale"):
+            Recommendation(**valid_recommendation)
+
+    def test_empty_evidence_raises(self, valid_recommendation):
+        valid_recommendation["evidence"] = ""
+        with pytest.raises(ValidationError, match="evidence"):
             Recommendation(**valid_recommendation)
 
     def test_recommendation_type_is_extensible_string(self, valid_recommendation):

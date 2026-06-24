@@ -38,7 +38,7 @@ Implement the Snowflake integration capable of querying the V1 telemetry sources
 - Lazy, on-demand `operator_stats` fetcher (using `GET_QUERY_OPERATOR_STATS`).
 
 **Architectural Constraint:**
-- `operator_stats` retrieval must be **lazy and on-demand**. Never fetch profiles for all queries. Only fetch profiles for candidate queries explicitly identified by the Detection Engine.
+- `operator_stats` retrieval must be **lazy and on-demand**. Never fetch operator stats for all queries. Only fetch operator stats for candidate queries explicitly identified by the Detection Engine.
 
 **Dependencies:** 
 - Phase 1 (Domain Models).

@@ -577,12 +577,12 @@ class IssueDetector:
     def determine_evidence_quality(
         self,
         snapshot: TelemetrySnapshot,
-        triggered_rules_needing_profile: bool,
-        profile_retrieved: bool,
+        triggered_rules_needing_operator_stats: bool,
+        operator_stats_retrieved: bool,
     ) -> EvidenceQuality:
         """Determines the telemetry completeness quality score."""
-        # 1. Check if profile retrieval failed when explicitly needed
-        if triggered_rules_needing_profile and not profile_retrieved:
+        # 1. Check if operator stats retrieval failed when explicitly needed
+        if triggered_rules_needing_operator_stats and not operator_stats_retrieved:
             return EvidenceQuality.LIMITED
 
         # 2. Check if primary telemetry columns are present
@@ -647,13 +647,13 @@ class IssueDetector:
             "MEDIUM"
         )
 
-        profile_needed = stage1_expensive_join or stage1_cartesian or stage1_shuffle
-        profile_retrieved = operator_stats is not None and len(operator_stats) > 0
+        operator_stats_needed = stage1_expensive_join or stage1_cartesian or stage1_shuffle
+        operator_stats_retrieved = operator_stats is not None and len(operator_stats) > 0
 
         quality = self.determine_evidence_quality(
             snapshot,
-            triggered_rules_needing_profile=profile_needed,
-            profile_retrieved=profile_retrieved,
+            triggered_rules_needing_operator_stats=operator_stats_needed,
+            operator_stats_retrieved=operator_stats_retrieved,
         )
 
         return issues, quality

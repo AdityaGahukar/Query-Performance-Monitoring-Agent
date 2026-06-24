@@ -164,7 +164,8 @@ class Recommendation(BaseModel):
     recommendation_type: str = Field(
         description=(
             "Extensible category label for this recommendation, "
-            "e.g. 'SCALE_UP', 'REWRITE_SQL', 'CLUSTER_TABLE', 'ENABLE_RESULT_CACHE'."
+            "e.g. 'QUERY', 'WAREHOUSE', 'CONCURRENCY', 'COST_OPTIMIZATION', "
+            "'TABLE_DESIGN', 'PARTITION_PRUNING', 'RESOURCE_CONTENTION', 'DATA_MODELING'."
         ),
         min_length=1,
     )
@@ -177,6 +178,18 @@ class Recommendation(BaseModel):
             "LLM-generated statement of the expected performance or cost impact "
             "if this recommendation is applied."
         ),
+        min_length=1,
+    )
+    priority: str = Field(
+        description="Priority of applying this recommendation: LOW, MEDIUM, HIGH, or CRITICAL.",
+        min_length=1,
+    )
+    rationale: str = Field(
+        description="LLM reasoning explaining why this action is recommended.",
+        min_length=1,
+    )
+    evidence: str = Field(
+        description="Telemetry evidence supporting the recommendation (e.g. specific metrics or operator IDs).",
         min_length=1,
     )
 
