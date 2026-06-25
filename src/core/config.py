@@ -71,7 +71,7 @@ class GeminiSettings(BaseSettings):
 
     api_key: str = Field(description="Google Gemini API key.")
     model_name: str = Field(
-        default="gemini-1.5-pro",
+        default="gemini-3.5-flash",
         description="Gemini model identifier to use for RCA generation.",
     )
     request_timeout_seconds: int = Field(
@@ -85,6 +85,10 @@ class GeminiSettings(BaseSettings):
         description="Maximum number of retry attempts on transient Gemini API errors.",
         ge=1,
         le=10,
+    )
+    prompt_version: str = Field(
+        default="v1_default",
+        description="Version string for loading system and user prompts.",
     )
 
 

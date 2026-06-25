@@ -91,12 +91,17 @@ class TestGeminiSettings:
     def test_default_model_name(self, monkeypatch):
         monkeypatch.setenv("GEMINI_API_KEY", "test_key")
         settings = GeminiSettings()
-        assert settings.model_name == "gemini-1.5-pro"
+        assert settings.model_name == "gemini-3.5-flash"
 
     def test_default_timeout(self, monkeypatch):
         monkeypatch.setenv("GEMINI_API_KEY", "test_key")
         settings = GeminiSettings()
         assert settings.request_timeout_seconds == 60
+
+    def test_default_prompt_version(self, monkeypatch):
+        monkeypatch.setenv("GEMINI_API_KEY", "test_key")
+        settings = GeminiSettings()
+        assert settings.prompt_version == "v1_default"
 
     def test_default_max_retries(self, monkeypatch):
         monkeypatch.setenv("GEMINI_API_KEY", "test_key")
