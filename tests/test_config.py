@@ -18,6 +18,7 @@ from pydantic import ValidationError
 
 from src.core.config import (
     GeminiSettings,
+    LLMSettings,
     LoggingSettings,
     SchedulerSettings,
     Settings,
@@ -45,9 +46,14 @@ GEMINI_ENVS = {
     "GEMINI_API_KEY": "test_api_key_abc123",
 }
 
+LLM_ENVS = {
+    "LLM_API_KEY": "test_nvidia_key_abc123",
+}
+
 ROOT_ENVS = {
     **SNOWFLAKE_ENVS,
     **GEMINI_ENVS,
+    **LLM_ENVS,
 }
 
 
@@ -127,9 +133,13 @@ class TestGeminiSettings:
             GeminiSettings()
 
     def test_missing_api_key_raises(self, monkeypatch):
+        for k, v in ROOT_ENVS.items():
+            monkeypatch.setenv(k, v)
+        monkeypatch.setenv("LLM_PROVIDER", "gemini")
         monkeypatch.delenv("GEMINI_API_KEY", raising=False)
-        with pytest.raises(ValidationError, match="api_key"):
-            GeminiSettings()
+        monkeypatch.delenv("LLM_API_KEY", raising=False)
+        with pytest.raises(ValidationError, match="API key for Gemini"):
+            Settings()
 
 
 # =============================================================================
@@ -273,6 +283,31 @@ class TestSettings:
             monkeypatch.setenv(k, v)
         settings = Settings()
         assert isinstance(settings.logging, LoggingSettings)
+
+    def test_nested_llm_settings(self, monkeypatch):
+        for k, v in ROOT_ENVS.items():
+            monkeypatch.setenv(k, v)
+        settings = Settings()
+        assert isinstance(settings.llm, LLMSettings)
+        assert settings.llm.provider == "nvidia"
+
+    def test_nvidia_provider_validation(self, monkeypatch):
+        for k, v in ROOT_ENVS.items():
+            monkeypatch.setenv(k, v)
+        # Switch to nvidia
+        monkeypatch.setenv("LLM_PROVIDER", "nvidia")
+        
+        # Missing LLM_API_KEY raises ValidationError
+        monkeypatch.delenv("LLM_API_KEY", raising=False)
+        with pytest.raises(ValidationError, match="API key for NVIDIA"):
+            Settings()
+
+        # Adding LLM_API_KEY resolves correctly
+        monkeypatch.setenv("LLM_API_KEY", "nvidia-key")
+        settings = Settings()
+        assert settings.llm.provider == "nvidia"
+        assert settings.llm.api_key == "nvidia-key"
+        assert settings.llm.model == "meta/llama-3.1-8b-instruct"
 
 
 # =============================================================================

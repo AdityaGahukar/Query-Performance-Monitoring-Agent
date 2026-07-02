@@ -31,3 +31,9 @@ build/
 # Local state & watermark fallbacks
 .watermarks.json
 nonexistent*.json
+
+# Temp docs folder
+temp/
+
+# Compiled Snowflake procedure stage dependencies
+snowflake_native/procedure/src.zip

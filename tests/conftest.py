@@ -18,6 +18,7 @@ if not os.environ.get("RUN_SNOWFLAKE_INTEGRATION_TESTS"):
     os.environ.setdefault("SNOWFLAKE_SCHEMA", "TEST_SCHEMA")
     os.environ.setdefault("SNOWFLAKE_ROLE", "TEST_ROLE")
     os.environ.setdefault("GEMINI_API_KEY", "test_gemini_key")
+    os.environ.setdefault("LLM_API_KEY", "test_nvidia_key")
     os.environ.setdefault("LOG_FORMAT", "text")
 
 

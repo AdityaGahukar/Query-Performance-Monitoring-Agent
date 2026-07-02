@@ -1,0 +1,98 @@
+[
+  {
+    "query_id": "01c56eee-0002-564b-001d-0457002a0062",
+    "query_text": "CREATE OR REPLACE TEMPORARY TABLE POV4_DB.MONITORING.POV5_PRUNING_TEMP_1 AS\n        SELECT COUNT(*) as cnt\n        FROM SNOWFLAKE_SAMPLE_DATA.TPCH_SF100.LINEITEM\n        WHERE L_COMMENT LIKE '%not_matching_anything_at_all_variant_1%'\n        LIMIT 1;",
+    "severity": "HIGH",
+    "issues": [
+      "POOR_PARTITION_PRUNING"
+    ],
+    "rca": "Poor partition pruning caused by a high pruning ratio (0.9) on a table scan of 2000 partitions, resulting in excessive data being scanned (15 GB).",
+    "recommendations": [
+      {
+        "type": "PARTITION_PRUNING",
+        "priority": "HIGH",
+        "description": "Add a filter constraint on the L_COMMENT column to reduce the number of partitions scanned."
+      }
+    ]
+  },
+  {
+    "query_id": "01c56eee-0002-5338-001d-04570027d282",
+    "query_text": "CREATE OR REPLACE TEMPORARY TABLE POV4_DB.MONITORING.POV5_SPILL_TEMP_1 AS\n        SELECT L_COMMENT, COUNT(*) as cnt\n        FROM SNOWFLAKE_SAMPLE_DATA.TPCH_SF100.LINEITEM\n        WHERE L_LINENUMBER = 1\n        GROUP BY L_COMMENT\n        ORDER BY L_COMMENT DESC\n        LIMIT 5;",
+    "severity": "MEDIUM",
+    "issues": [
+      "REMOTE_SPILL"
+    ],
+    "rca": "Remote spill occurred due to excessive data being written to remote storage (2,000,000,000 bytes).",
+    "recommendations": [
+      {
+        "type": "WAREHOUSE",
+        "priority": "HIGH",
+        "description": "Increase the warehouse size to prevent remote disk spilling."
+      }
+    ]
+  },
+  {
+    "query_id": "01c56eee-0002-55fc-001d-04570029d0a6",
+    "query_text": "CREATE OR REPLACE TEMPORARY TABLE POV4_DB.MONITORING.POV5_SPILL_TEMP_2 AS\n        SELECT L_COMMENT, COUNT(*) as cnt\n        FROM SNOWFLAKE_SAMPLE_DATA.TPCH_SF100.LINEITEM\n        WHERE L_LINENUMBER = 2\n        GROUP BY L_COMMENT\n        ORDER BY L_COMMENT DESC\n        LIMIT 5;",
+    "severity": "MEDIUM",
+    "issues": [
+      "REMOTE_SPILL"
+    ],
+    "rca": "Remote spill occurred due to large data being written to remote storage (2,000,000,000 bytes).",
+    "recommendations": [
+      {
+        "type": "COST_OPTIMIZATION",
+        "priority": "HIGH",
+        "description": "Increase the warehouse size to prevent remote disk spilling."
+      }
+    ]
+  },
+  {
+    "query_id": "01c56efb-0002-51fe-001d-04570029b11a",
+    "query_text": "CREATE OR REPLACE TEMPORARY TABLE POV4_DB.MONITORING.POV5_PRUNING_TEMP_1 AS\n        SELECT COUNT(*) as cnt\n        FROM SNOWFLAKE_SAMPLE_DATA.TPCH_SF100.LINEITEM\n        WHERE L_COMMENT LIKE '%not_matching_anything_at_all_variant_1%'\n        LIMIT 1;",
+    "severity": "HIGH",
+    "issues": [
+      "POOR_PARTITION_PRUNING"
+    ],
+    "rca": "Poor partition pruning caused by a high pruning ratio (0.9) on a table scan, resulting in excessive data being scanned (15 GB).",
+    "recommendations": [
+      {
+        "type": "PARTITION_PRUNING",
+        "priority": "HIGH",
+        "description": "Add a filter constraint on L_COMMENT to reduce the number of partitions scanned."
+      }
+    ]
+  },
+  {
+    "query_id": "01c56efb-0002-51fe-001d-04570029b11e",
+    "query_text": "CREATE OR REPLACE TEMPORARY TABLE POV4_DB.MONITORING.POV5_SPILL_TEMP_1 AS\n        SELECT L_COMMENT, COUNT(*) as cnt\n        FROM SNOWFLAKE_SAMPLE_DATA.TPCH_SF100.LINEITEM\n        WHERE L_LINENUMBER = 1\n        GROUP BY L_COMMENT\n        ORDER BY L_COMMENT DESC\n        LIMIT 5;",
+    "severity": "MEDIUM",
+    "issues": [
+      "REMOTE_SPILL"
+    ],
+    "rca": "Remote spill occurred due to 2 billion bytes spilled to remote storage, exceeding the threshold.",
+    "recommendations": [
+      {
+        "type": "WAREHOUSE",
+        "priority": "HIGH",
+        "description": "Increase the warehouse size to prevent remote disk spilling."
+      }
+    ]
+  },
+  {
+    "query_id": "01c56efb-0002-547e-001d-04570027532e",
+    "query_text": "CREATE OR REPLACE TEMPORARY TABLE POV4_DB.MONITORING.POV5_SPILL_TEMP_2 AS\n        SELECT L_COMMENT, COUNT(*) as cnt\n        FROM SNOWFLAKE_SAMPLE_DATA.TPCH_SF100.LINEITEM\n        WHERE L_LINENUMBER = 2\n        GROUP BY L_COMMENT\n        ORDER BY L_COMMENT DESC\n        LIMIT 5;",
+    "severity": "MEDIUM",
+    "issues": [
+      "REMOTE_SPILL"
+    ],
+    "rca": "Remote spill occurred due to excessive data being written to remote storage (2,000,000,000 bytes), likely caused by insufficient warehouse size.",
+    "recommendations": [
+      {
+        "type": "WAREHOUSE",
+        "priority": "HIGH",
+        "description": "Increase the warehouse size to prevent remote disk spilling."
+      }
+    ]
+  }
+]

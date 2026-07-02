@@ -7,19 +7,20 @@ This document details the architectural decisions made for the implementation of
 ## Decision 1: Primary LLM Choice & Provider Abstraction
 
 ### Status
-Accepted
+Accepted / Enhanced
 
 ### Context
-We need to select an LLM provider that offers reliable performance, structured output parsing, low latency, and cost efficiency. We also need to design the architecture to accommodate alternative providers in the future (e.g., OpenRouter, Bedrock, Azure OpenAI) without modifying downstream layers.
+We need to select LLM providers that offer reliable performance, structured output parsing, low latency, and cost efficiency. We also need to design the architecture to accommodate multiple providers (e.g. Gemini, Nvidia, etc.) and allow switching between them purely via configuration.
 
 ### Decision
-1. **Google Gemini (specifically `gemini-3.5-flash`)** is selected as the primary default model due to its high speed, low cost, large context window (1M+ tokens), and strong performance in structured JSON output tasks.
-2. We will implement an `LLMProvider` abstract base class to decouple provider-specific client libraries (e.g. `google-genai` or standard `langchain` integrations) from the core analysis service logic.
+1. **Google Gemini (specifically `gemini-3.5-flash`)** is the primary default model.
+2. **Nvidia AI Endpoints** is supported as an alternative provider using `langchain_nvidia_ai_endpoints.ChatNVIDIA`.
+3. We implement an `LLMProvider` abstract base class to decouple provider-specific client libraries from the core analysis service logic. Selecting between providers is done via the `LLM_PROVIDER` environment variable.
 
 ### Rationale
-- **Economics**: `gemini-3.5-flash` is extremely cost-effective for high-frequency telemetry logging pipelines.
-- **Structured Support**: Gemini natively supports structured output modes (JSON schema enforcement).
-- **Future-proofing**: Abstracting provider invocation allows developers to switch to other models simply by providing a different connection wrapper class.
+- **Economics**: Both models are highly cost-effective for high-frequency telemetry logging pipelines.
+- **Structured Support**: Gemini uses native structured output, while the Nvidia provider utilizes native structured output with a robust JSON-only validation + retry fallback to guarantee Pydantic validation success.
+- **Flexibility**: Abstracting provider invocation allows developers to switch models seamlessly through environment variables without any code modifications.
 
 ---
 

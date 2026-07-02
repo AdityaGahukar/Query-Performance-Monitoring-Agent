@@ -1,0 +1,15 @@
+=== DATA TO ANALYZE ===
+detected_issues:
+{detected_issues}
+
+query_history:
+{query_history}
+
+operator_stats:
+{operator_stats}
+
+warehouse_load:
+{warehouse_load}
+
+query_attribution:
+{query_attribution}

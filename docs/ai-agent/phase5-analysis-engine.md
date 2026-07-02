@@ -150,8 +150,8 @@ To ensure cost predictability and performance limits, the Analysis Engine implem
 
 1. **Strict Context Budget**: Max inputs are limited to `15,000` tokens.
 2. **Max Operator Limits**: A hard limit of **10 operators** per LLM call.
-3. **Response Token Budget**: The Pydantic output parser targets compact JSON output. `max_output_tokens` is capped at `1,500` tokens, which is more than sufficient for structured RCA and recommendations.
-4. **Retry Budget**: If JSON validation fails or Gemini times out, the system retries a maximum of **2 times** using exponential backoff before routing the query telemetry to the DLQ.
+3. **Response Token Budget**: Capped at `1,500` tokens, which is more than sufficient for structured RCA and recommendations.
+4. **Retry Budget**: If JSON validation fails or the provider times out, the system retries up to configured retries (default 3) using incremental backoff before returning fallback results or logging to DLQ. For 429 rate limit/quota errors, the system triggers an extended sleep period (15s+) to allow rate limits to reset.
 
 ---
 
@@ -159,10 +159,21 @@ To ensure cost predictability and performance limits, the Analysis Engine implem
 
 For every execution, the system captures performance metadata to trace model behavior, cost, and latency over time. This metadata is saved inline under the `llm_metadata` field of the `AnalysisResult` model:
 
-* **`provider`**: The LLM provider (e.g., `gemini`, `openrouter`).
-* **`model`**: The specific model name and version used (e.g., `gemini-3.5-flash`).
+* **`provider`**: The LLM provider (e.g., `nvidia`).
+* **`model`**: The specific model name and version used (e.g., `meta/llama-3.1-8b-instruct`).
 * **`latency_ms`**: Time taken for the API request to complete.
-* **`input_tokens`**: Number of tokens in the prompt.
-* **`output_tokens`**: Number of tokens in the response.
 * **`retries_count`**: Number of retries executed for this analysis.
 * **`validation_failures`**: List of parser/validation errors encountered before a successful run.
+
+---
+
+## 9. Nvidia AI Endpoints Integration
+
+The Analysis Engine supports provider backends selected dynamically via configuration:
+
+### Nvidia AI Endpoints Provider
+- **Execution client**: `ChatNVIDIA`
+- **Base Endpoint**: Standard NVIDIA AI Endpoints or custom URL (e.g. `LLM_BASE_URL`).
+- **Structured Response Fallback**:
+  - **Attempt 1**: The provider first attempts to use LangChain's native `with_structured_output(...)` parser.
+  - **Attempt 2 (Fallback)**: If native structured output fails or is unsupported by the target model, the provider injects JSON-only formatting instructions into the system prompt, parses raw markdown text responses to locate the JSON block, validates it against the expected Pydantic schema, and triggers retry loops in case of schema validation failures.

@@ -14,6 +14,8 @@ from src.domain.models import AnalysisResult, DetectedIssue, Recommendation, Tel
 from src.agents.providers import (
     LLMProvider,
     GeminiProvider,
+    NvidiaProvider,
+    get_provider,
     LLMAnalysisError,
     LLMProviderError,
     LLMTimeoutError,
@@ -77,6 +79,13 @@ def mock_settings() -> Settings:
     settings.gemini.max_retries = 2
     settings.gemini.request_timeout_seconds = 5
     settings.gemini.prompt_version = "v1_default"
+
+    settings.llm.provider = "nvidia"
+    settings.llm.api_key = "mock-nvidia-key"
+    settings.llm.model = "meta/llama-3.1-8b-instruct"
+    settings.llm.max_retries = 2
+    settings.llm.request_timeout_seconds = 5
+    settings.llm.prompt_version = "v1_default"
     return settings
 
 
@@ -258,8 +267,8 @@ class TestQueryPerformanceAnalyzer:
         assert rec.evidence == "Operator 1 TableScan scanned 10/10 partitions."
 
         # Metadata checks
-        assert res.llm_metadata["provider"] == "gemini"
-        assert res.llm_metadata["model"] == "gemini-3.5-flash"
+        assert res.llm_metadata["provider"] == "nvidia"
+        assert res.llm_metadata["model"] == "meta/llama-3.1-8b-instruct"
         assert res.llm_metadata["prompt_version"] == "v1_default"
         assert res.llm_metadata["success"] is True
         assert res.llm_metadata["validation_failures"] is None
@@ -405,3 +414,156 @@ class TestGeminiProvider:
         provider = GeminiProvider(api_key="mock-key")
         with pytest.raises(LLMProviderError):
             provider.generate("Sys", "User")
+
+
+# ---------------------------------------------------------------------------
+# Test Nvidia Provider
+# ---------------------------------------------------------------------------
+
+class TestNvidiaProvider:
+    def test_nvidia_provider_requires_api_key(self):
+        with pytest.raises(LLMProviderError, match="API key is required"):
+            NvidiaProvider(api_key="")
+
+    @patch("src.agents.providers.nvidia.ChatNVIDIA")
+    def test_nvidia_provider_generate_raw_text(self, mock_chat_class):
+        mock_chat = MagicMock()
+        mock_response = MagicMock()
+        mock_response.content = "Mocked Nvidia response."
+        mock_chat.invoke.return_value = mock_response
+        mock_chat_class.return_value = mock_chat
+
+        provider = NvidiaProvider(api_key="mock-key", model_name="meta/llama-3.1-8b-instruct", base_url="http://custom-url")
+        res = provider.generate("Sys", "User", response_schema=None)
+        assert res == "Mocked Nvidia response."
+        mock_chat_class.assert_called_once_with(
+            model="meta/llama-3.1-8b-instruct",
+            nvidia_api_key="mock-key",
+            api_key="mock-key",
+            base_url="http://custom-url",
+            temperature=0.0,
+            timeout=60.0
+        )
+
+    @patch("src.agents.providers.nvidia.ChatNVIDIA")
+    def test_nvidia_provider_generate_structured_native(self, mock_chat_class):
+        class Schema(BaseModel):
+            summary: str
+
+        mock_chat = MagicMock()
+        mock_structured = MagicMock()
+        
+        model_instance = Schema(summary="Structured result")
+        mock_structured.invoke.return_value = model_instance
+        mock_chat.with_structured_output.return_value = mock_structured
+        mock_chat_class.return_value = mock_chat
+
+        provider = NvidiaProvider(api_key="mock-key")
+        res = provider.generate("Sys", "User", response_schema=Schema)
+        assert res == {"summary": "Structured result"}
+        mock_chat.with_structured_output.assert_called_once_with(Schema)
+
+    @patch("src.agents.providers.nvidia.ChatNVIDIA")
+    def test_nvidia_provider_generate_structured_fallback(self, mock_chat_class):
+        class Schema(BaseModel):
+            summary: str
+
+        mock_chat = MagicMock()
+        mock_chat.with_structured_output.side_effect = NotImplementedError("Not supported on this endpoint")
+        
+        mock_response = MagicMock()
+        mock_response.content = '{"summary": "Fallback parsed output"}'
+        mock_chat.invoke.return_value = mock_response
+        mock_chat_class.return_value = mock_chat
+
+        provider = NvidiaProvider(api_key="mock-key")
+        res = provider.generate("Sys", "User", response_schema=Schema)
+        assert res == {"summary": "Fallback parsed output"}
+
+    @patch("src.agents.providers.nvidia.ChatNVIDIA")
+    def test_nvidia_provider_generate_structured_fallback_with_markdown_wrap(self, mock_chat_class):
+        class Schema(BaseModel):
+            summary: str
+
+        mock_chat = MagicMock()
+        mock_chat.with_structured_output.side_effect = NotImplementedError()
+        
+        mock_response = MagicMock()
+        mock_response.content = '```json\n{"summary": "Markdown wrapped fallback"}\n```'
+        mock_chat.invoke.return_value = mock_response
+        mock_chat_class.return_value = mock_chat
+
+        provider = NvidiaProvider(api_key="mock-key")
+        res = provider.generate("Sys", "User", response_schema=Schema)
+        assert res == {"summary": "Markdown wrapped fallback"}
+
+    @patch("src.agents.providers.nvidia.ChatNVIDIA")
+    def test_nvidia_provider_timeout_exception(self, mock_chat_class):
+        mock_chat = MagicMock()
+        mock_chat.invoke.side_effect = Exception("Connection timed out.")
+        mock_chat_class.return_value = mock_chat
+
+        provider = NvidiaProvider(api_key="mock-key")
+        with pytest.raises(LLMTimeoutError):
+            provider.generate("Sys", "User")
+
+    @patch("src.agents.providers.nvidia.ChatNVIDIA")
+    def test_nvidia_provider_rate_limit_exception(self, mock_chat_class):
+        mock_chat = MagicMock()
+        mock_chat.invoke.side_effect = Exception("Rate limit exceeded 429 quota.")
+        mock_chat_class.return_value = mock_chat
+
+        provider = NvidiaProvider(api_key="mock-key")
+        with pytest.raises(LLMProviderError):
+            provider.generate("Sys", "User")
+
+    @patch("src.agents.providers.nvidia.ChatNVIDIA")
+    def test_nvidia_provider_validation_exception(self, mock_chat_class):
+        class Schema(BaseModel):
+            summary: str
+
+        mock_chat = MagicMock()
+        mock_chat.with_structured_output.side_effect = NotImplementedError()
+        mock_response = MagicMock()
+        mock_response.content = '{"invalid_field": "test"}'
+        mock_chat.invoke.return_value = mock_response
+        mock_chat_class.return_value = mock_chat
+
+        provider = NvidiaProvider(api_key="mock-key")
+        with pytest.raises(LLMValidationError):
+            provider.generate("Sys", "User", response_schema=Schema)
+
+
+# ---------------------------------------------------------------------------
+# Test Provider Selection
+# ---------------------------------------------------------------------------
+
+class TestProviderSelection:
+    def test_get_provider_gemini(self, mock_settings):
+        mock_settings.llm.provider = "gemini"
+        mock_settings.llm.api_key = None
+        mock_settings.llm.model = None
+        mock_settings.gemini.api_key = "gemini-key"
+        mock_settings.gemini.model_name = "gemini-model"
+        
+        provider = get_provider(mock_settings)
+        assert isinstance(provider, GeminiProvider)
+        assert provider.api_key == "gemini-key"
+        assert provider.model_name == "gemini-model"
+
+    def test_get_provider_nvidia(self, mock_settings):
+        mock_settings.llm.provider = "nvidia"
+        mock_settings.llm.api_key = "nvidia-key"
+        mock_settings.llm.model = "nvidia-model"
+        mock_settings.llm.base_url = "http://nvidia-url"
+        
+        provider = get_provider(mock_settings)
+        assert isinstance(provider, NvidiaProvider)
+        assert provider.api_key == "nvidia-key"
+        assert provider.model_name == "nvidia-model"
+        assert provider.base_url == "http://nvidia-url"
+
+    def test_get_provider_invalid(self, mock_settings):
+        mock_settings.llm.provider = "invalid_llm"
+        with pytest.raises(ValueError, match="Unknown LLM provider"):
+            get_provider(mock_settings)

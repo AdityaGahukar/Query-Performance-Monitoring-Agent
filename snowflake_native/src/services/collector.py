@@ -14,6 +14,21 @@ logger = get_logger(__name__)
 SQL_DIR = Path(__file__).parent / "sql"
 
 
+import zipfile
+import re
+
+def _read_file_safe(file_path: str) -> str:
+    match = re.search(r"^(.*\.zip)[/\\].*$", file_path, re.IGNORECASE)
+    if match:
+        zip_path = match.group(1)
+        internal_path = file_path[len(zip_path):].lstrip("/\\").replace("\\", "/")
+        with zipfile.ZipFile(zip_path, "r") as z:
+            return z.read(internal_path).decode("utf-8")
+    else:
+        with open(file_path, "r") as f:
+            return f.read()
+
+
 class TelemetryCollector:
     """
     Collects telemetry from Snowflake incrementally, managing watermarks,
@@ -25,8 +40,8 @@ class TelemetryCollector:
         self.wm = watermark_manager
 
     def _read_sql(self, filename: str) -> str:
-        with open(SQL_DIR / filename, "r") as f:
-            return f.read()
+        sql_path = str(SQL_DIR / filename)
+        return _read_file_safe(sql_path)
 
     def _execute_incremental(self, source_name: str, sql_file: str) -> List[Dict[str, Any]]:
         """Helper to run an incremental query and update the watermark."""
